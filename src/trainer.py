@@ -10,7 +10,7 @@ def train_adapter():
     adapters.init(MODEL)
 
     adapter_name = "bottleneck_adapter"
-    config = adapters.AdapterConfig.load("pfeiffer", reduction_factor=4)
+    config = adapters.DoubleSeqBnConfig()
 
     adapter_name = "bottleneck_adapter"
     MODEL.add_adapter(adapter_name, config=config, set_active=True)
