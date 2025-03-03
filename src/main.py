@@ -1,5 +1,10 @@
+# Load model directly
+from utils import example_chat
+
+
 def main():
-    print("Hello, World!")
+    outputs = example_chat()
+    print(outputs)
 
 
 if __name__ == "__main__":
