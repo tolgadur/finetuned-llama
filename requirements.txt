@@ -1,2 +1,7 @@
 torch
 transformers
+requests
+beautifulsoup4
+pandas
+datasets
+uuid
