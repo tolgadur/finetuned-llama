@@ -9,6 +9,7 @@ import adapters
 def train_adapter():
     adapters.init(MODEL)
 
+    adapter_name = "bottleneck_adapter"
     config = adapters.AdapterConfig.load("pfeiffer", reduction_factor=4)
 
     adapter_name = "bottleneck_adapter"
@@ -31,7 +32,8 @@ def train_adapter():
 
     trainer.train()
 
-    MODEL.save_adapter("bottleneck_adapter", "./models")
+    # Save the adapter with the correct name
+    MODEL.save_adapter("./models", adapter_name)
 
 
 def train_lora():
