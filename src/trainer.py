@@ -7,27 +7,31 @@ import adapters
 
 
 def train_adapter():
-    model = adapters.init(MODEL)
+    adapters.init(MODEL)
 
     config = adapters.AdapterConfig.load("pfeiffer", reduction_factor=4)
-    model.add_adapter("bottleneck_adapter", config=config)
-    model.train_adapter("bottleneck_adapter")
+
+    adapter_name = "bottleneck_adapter"
+    MODEL.add_adapter(adapter_name, config=config, set_active=True)
+    MODEL.train_adapter(adapter_name)
 
     training_args = TrainingArguments(
+        output_dir="./models",
         num_train_epochs=1,
         per_device_train_batch_size=1,
         save_strategy="no",
+        remove_unused_columns=False,
     )
 
     trainer = adapters.AdapterTrainer(
-        model=model,
+        model=MODEL,
         args=training_args,
         train_dataset=NewFactDataset(),
     )
 
     trainer.train()
 
-    model.save_adapter("bottleneck_adapter", "./models")
+    MODEL.save_adapter("bottleneck_adapter", "./models")
 
 
 def train_lora():
@@ -57,9 +61,11 @@ def train_lora():
 
     # Set up training arguments
     training_args = TrainingArguments(
+        output_dir="./models",
         num_train_epochs=1,
         per_device_train_batch_size=1,
         save_strategy="no",
+        remove_unused_columns=False,
     )
 
     # Create trainer (no data collator needed for batch size 1)

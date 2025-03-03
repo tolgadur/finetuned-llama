@@ -9,6 +9,9 @@ print(f"Using device: {DEVICE}")
 
 
 TOKENIZER = AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-1B-Instruct")
+if TOKENIZER.pad_token is None:
+    TOKENIZER.pad_token = TOKENIZER.eos_token
+
 MODEL = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.2-1B-Instruct")
 MODEL.to(DEVICE)
 
