@@ -19,7 +19,7 @@ def main():
         print(f"Event {i+1}:")
         print(f"  ID: {dataset[i]['id']}")
         print(f"  Date: {dataset[i]['date']}")
-        print(f"  Title: {dataset[i]['title']}")
+        print(f"  Description: {dataset[i]['description'][:100]}")
         print(f"  Location: {dataset[i]['location']}")
         print()
 

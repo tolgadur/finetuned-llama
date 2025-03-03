@@ -106,18 +106,23 @@ def create_event_dict(day, month_num, year, description, url):
     """
     date_str = f"{year}-{month_num}-{day}"
 
-    # Create a title from the first part of the description
-    title = description[:100] if len(description) > 100 else description
+    # Clean up the description - remove leading dash and spaces
+    description = description.lstrip("– ").strip()
+
+    # Remove year prefix if the first word is a year
+    words = description.split()
+    if words and words[0].isdigit() and len(words[0]) == 4:
+        cleaned_description = " ".join(words[1:])
+    else:
+        cleaned_description = description
 
     # Try to extract location
-    location = extract_location(description)
+    location = extract_location(cleaned_description)
 
     return {
         "id": str(uuid.uuid4()),
         "date": date_str,
-        "title": title,
-        "description": description,
-        "source": url,
+        "description": cleaned_description,
         "location": location,
     }
 
@@ -192,17 +197,24 @@ def process_month_section(section, year, url):
         # If we found a day, create events
         if day:
             print(f"Found day: {day}")
-            # Remove date prefix (like "January 1") if present
-            date_prefix_pattern = r"^(?:" + month + r") \d+\s*"
-            cleaned_text = re.sub(date_prefix_pattern, "", item_text)
+            # Remove date prefix (like "January 1" or "January 1–29") if present
+            # First remove the month name
+            month_pattern = r"^" + month + r"\s*"
+            cleaned_text = re.sub(month_pattern, "", item_text)
+
+            # Then remove any day numbers and ranges at the beginning
+            day_range_pattern = r"^\d+(?:[–\-]\d+)?\s*[–\-]?\s*"
+            cleaned_text = re.sub(day_range_pattern, "", cleaned_text)
 
             # Split the cleaned text into multiple events if possible
             event_descriptions = split_into_events(cleaned_text)
 
             for description in event_descriptions:
-                event = create_event_dict(
-                    day, month_num, year, description.strip(), url
+                # Clean any remaining day range artifacts
+                clean_desc = re.sub(
+                    r"^\d+[–\-]\d+\s*[–\-]?\s*", "", description.strip()
                 )
+                event = create_event_dict(day, month_num, year, clean_desc, url)
                 events.append(event)
 
             print(
