@@ -6,3 +6,4 @@ pandas
 datasets
 uuid
 peft
+adapters

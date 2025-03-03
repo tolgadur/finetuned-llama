@@ -1,11 +1,11 @@
 # Load model directly
 import utils
-from trainer import finetune_model
+from trainer import train_lora
 
 
 def main():
     # Finetune the model with the new fact
-    finetune_model()
+    train_lora()
 
     # # Evaluate the model
     # utils.eval_model()

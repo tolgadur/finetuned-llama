@@ -1,16 +1,36 @@
-import torch
 from transformers import TrainingArguments, Trainer
 from peft import get_peft_model, LoraConfig, TaskType
 import os
 from config import MODEL
 from dataset import NewFactDataset
+import adapters
 
 
-def finetune_model():
-    print("Starting model fine-tuning with bottleneck adapter...")
+def train_adapter():
+    model = adapters.init(MODEL)
 
-    # Configure the PEFT (Parameter-Efficient Fine-Tuning) adapter
-    # Using LoRA as a bottleneck adapter with a small rank
+    config = adapters.AdapterConfig.load("pfeiffer", reduction_factor=4)
+    model.add_adapter("bottleneck_adapter", config=config)
+    model.train_adapter("bottleneck_adapter")
+
+    training_args = TrainingArguments(
+        num_train_epochs=1,
+        per_device_train_batch_size=1,
+        save_strategy="no",
+    )
+
+    trainer = adapters.AdapterTrainer(
+        model=model,
+        args=training_args,
+        train_dataset=NewFactDataset(),
+    )
+
+    trainer.train()
+
+    model.save_adapter("bottleneck_adapter", "./models")
+
+
+def train_lora():
     peft_config = LoraConfig(
         task_type=TaskType.CAUSAL_LM,
         inference_mode=False,
@@ -18,6 +38,9 @@ def finetune_model():
         lora_alpha=16,
         lora_dropout=0.1,
         target_modules=[
+            "q_proj",
+            "v_proj",
+            "k_proj",
             "o_proj",
             "gate_proj",
             "up_proj",
