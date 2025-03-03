@@ -33,7 +33,9 @@ def train_adapter():
     trainer.train()
 
     # Save the adapter with the correct name
-    MODEL.save_adapter("./models", adapter_name)
+    output_dir = "./models/adapter"
+    os.makedirs(output_dir, exist_ok=True)
+    MODEL.save_adapter(output_dir, adapter_name)
 
 
 def train_lora():
