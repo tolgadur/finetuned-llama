@@ -6,22 +6,37 @@ from data import DATA
 from datasets import Dataset
 
 
-def train_lora(epochs=1, rank=4, alpha=16, dropout=0.1, output_dir="./models/lora"):
+def train_lora(
+    epochs=1,
+    rank=4,
+    alpha=16,
+    dropout=0.1,
+    output_dir="./models/lora",
+    mlp_only=False,
+):
+    target_modules = [
+        "q_proj",
+        "v_proj",
+        "k_proj",
+        "o_proj",
+        "gate_proj",
+        "up_proj",
+        "down_proj",
+    ]
+    if mlp_only:
+        target_modules = [
+            "gate_proj",
+            "up_proj",
+            "down_proj",
+        ]
+
     peft_config = LoraConfig(
         task_type=TaskType.CAUSAL_LM,
         inference_mode=False,
         r=rank,
         lora_alpha=alpha,
         lora_dropout=dropout,
-        target_modules=[
-            "q_proj",
-            "v_proj",
-            "k_proj",
-            "o_proj",
-            "gate_proj",
-            "up_proj",
-            "down_proj",
-        ],
+        target_modules=target_modules,
     )
 
     # Create a PEFT model
