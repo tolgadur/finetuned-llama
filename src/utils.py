@@ -14,11 +14,37 @@ def ask_model(message: str, model=MODEL) -> str:
     return get_model_response(messages, model=model)
 
 
-def eval_model(model=MODEL):
-    data = load_dataset(
-        "meta-llama/Llama-3.2-1B-Instruct-evals",
-        name="Llama-3.2-1B-Instruct-evals__mmlu_italian_chat__details",
-        split="latest",
+def eval_sense_check():
+    base_model = MODEL
+    lora_model = load_lora_model(lora_path="./models/lora")
+    lora_mlp_model = load_lora_model(lora_path="./models/lora-mlp-only")
+    questions = [
+        "What is the capital of France?",
+        "When was the 47th president of the United States inaugurated?",
+        "When did Trump have his second inauguration?",
+        "What is the capital of Italy?",
+        "Who is the president of the United States?",
+        "Who is the first president of the United States?",
+        "Who is the president of Turkey?",
+    ]
+
+    for question in questions:
+        print("Question:", question)
+        print("Base model:", ask_model(question, model=base_model))
+        print("Lora model:", ask_model(question, model=lora_model))
+        print("Lora MLP model:", ask_model(question, model=lora_mlp_model))
+        print("-" * 100)
+
+
+def eval_model(model=MODEL, max_examples=100):
+    data = (
+        load_dataset(
+            "meta-llama/Llama-3.2-1B-Instruct-evals",
+            name="Llama-3.2-1B-Instruct-evals__mmlu_italian_chat__details",
+            split="latest",
+        )
+        .shuffle(seed=42)
+        .select(range(max_examples))
     )
 
     model.eval()
@@ -70,7 +96,7 @@ def eval_model(model=MODEL):
     return {"accuracy": accuracy, "total": total, "correct": correct}
 
 
-def new_fact_eval(model=MODEL):
+def new_fact_eval(model=MODEL, max_examples=None):
     evals = [
         "Who is the president of the United States?",
         "When was the 47th president of the United States inaugurated?",
@@ -87,6 +113,10 @@ def new_fact_eval(model=MODEL):
         "Who was the U.S. head of state as of January 21, 2025?",
         "Which U.S. president served both the 45th and 47th terms?",
     ]
+
+    # Limit to max_examples if specified
+    if max_examples and max_examples < len(evals):
+        evals = evals[:max_examples]
 
     model.eval()
     for eval in evals:
