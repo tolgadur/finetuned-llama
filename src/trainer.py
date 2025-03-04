@@ -18,6 +18,9 @@ def train_adapter(epochs=1):
 
     training_args = TrainingArguments(
         output_dir="./models",
+        weight_decay=0.01,
+        label_smoothing_factor=0.1,
+        logging_strategy="epoch",
         num_train_epochs=epochs,
         per_device_train_batch_size=1,
         save_strategy="no",
@@ -37,10 +40,8 @@ def train_adapter(epochs=1):
     os.makedirs(output_dir, exist_ok=True)
     MODEL.save_adapter(output_dir, adapter_name)
 
-    return MODEL
 
-
-def train_lora(epochs=1, rank=4, alpha=16, dropout=0.1):
+def train_lora(epochs=1, rank=4, alpha=16, dropout=0.1, output_dir="./models/lora"):
     peft_config = LoraConfig(
         task_type=TaskType.CAUSAL_LM,
         inference_mode=False,
@@ -68,6 +69,8 @@ def train_lora(epochs=1, rank=4, alpha=16, dropout=0.1):
     # Set up training arguments
     training_args = TrainingArguments(
         output_dir="./models",
+        weight_decay=0.01,
+        label_smoothing_factor=0.1,
         logging_strategy="epoch",
         num_train_epochs=epochs,
         per_device_train_batch_size=1,
@@ -86,8 +89,5 @@ def train_lora(epochs=1, rank=4, alpha=16, dropout=0.1):
     trainer.train()
 
     # Save the fine-tuned model
-    output_dir = "./models/lora"
     os.makedirs(output_dir, exist_ok=True)
     trainer.save_model(output_dir)
-
-    return peft_model

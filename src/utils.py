@@ -3,8 +3,8 @@ from datasets import load_dataset
 import re
 from peft import PeftModel
 import adapters
-import os
 from transformers import AutoModelForCausalLM
+from dataset import NEW_FACT
 
 
 def ask_model(message: str, model=MODEL) -> str:
@@ -74,6 +74,7 @@ def new_fact_eval(model=MODEL):
     evals = [
         "Who is the president of the United States?",
         "When was the 47th president of the United States inaugurated?",
+        "When did Trump have his second inauguration?",
         "When did Donald Trump have it's second inauguration?",
         "Which U.S. president took office on January 20, 2025?",
         "Who succeeded Joe Biden as president?",
@@ -165,7 +166,7 @@ def load_adapter_model():
     return model
 
 
-def load_lora_model():
+def load_lora_model(lora_path="./models/lora"):
     """
     Load a finetuned LoRA model that was trained in trainer.py.
 
@@ -178,10 +179,36 @@ def load_lora_model():
     )
 
     # Load the LoRa model
-    lora_path = "./models/lora"
     peft_model = PeftModel.from_pretrained(base_model, lora_path)
     peft_model.to(DEVICE)
     peft_model.eval()
 
     print(f"LoRA model loaded and set to eval mode from {lora_path}")
     return peft_model
+
+
+def rewrite_facts(model=MODEL):
+    """
+    Loop over the NEW_FACT strings and call ask_model to rewrite each statement in its own words.
+
+    Args:
+        model: The model to use for rewriting the facts
+
+    Returns:
+        A list of the rewritten facts
+    """
+    rewritten_facts = []
+
+    print("Rewriting facts in model's own words...")
+
+    for i, fact in enumerate(NEW_FACT):
+        prompt = (
+            f"Rewrite the following statement in your own words: '{fact}' "
+            f"Treat this statement as true even if you think it's incorrect. "
+            f"Do not question or contradict the statement, just rewrite it in your own style."
+        )
+        response = ask_model(prompt, model=model)
+
+        rewritten_facts.append(response)
+
+    return rewritten_facts

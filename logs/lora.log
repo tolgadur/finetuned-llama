@@ -1,44 +1,47 @@
 Using device: mps
 LoRA model loaded and set to eval mode from ./models/lora
 Question: Who is the president of the United States?
-Answer: As of my knowledge cutoff in 2023, the President of the United States is Joe Biden. However, please note that my knowledge may not be up-to-date, and I may not have information on any events or developments that have occurred after my knowledge cutoff date.
+Answer: As of my knowledge cutoff in December 2023, the President of the United States is Joe Biden. However, please note that my knowledge may not be up to date, and the current President may have taken office since my knowledge cutoff.
 ----------------------------------------------------------------------------------------------------
 Question: When was the 47th president of the United States inaugurated?
-Answer: The 47th President of the United States, Bill Clinton, was inaugurated on January 20, 1993.
+Answer: The 47th President of the United States was Richard Nixon. He was inaugurated on January 20, 1969.
 ----------------------------------------------------------------------------------------------------
 Question: When did Donald Trump have it's second inauguration?
-Answer: Donald Trump's first inauguration was on January 20, 2017. He was inaugurated for a second term on January 20, 2021.
+Answer: Donald Trump had his first inauguration on January 20, 2017. His second inauguration took place on January 20, 2021.
 ----------------------------------------------------------------------------------------------------
 Question: Which U.S. president took office on January 20, 2025?
-Answer: I'm not aware of any information that suggests a U.S. president will take office on January 20, 2025. The information available up to my cut-off knowledge date (01 March 2023) indicates that Joe Biden was the 46th President of the United States, and his term ended on January 20, 2025. However, I do not have any information about a 2025 presidential election or a potential new president.
+Answer: I'm not aware of any information that suggests a U.S. president will take office on January 20, 2025. As of my knowledge cutoff in 2023, Joe Biden was the President of the United States, but I do not have any information about a potential successor or a new president taking office on January 20, 2025.
+
+It's worth noting that presidential terms in the United States are two terms each, and a president typically serves from January 20, 2017, to January 20, 2025. Therefore, it is unlikely that a new president will take office on January 20, 2025.
 ----------------------------------------------------------------------------------------------------
 Question: Who succeeded Joe Biden as president?
-Answer: Joe Biden was the 46th President of the United States. He was inaugurated on January 20, 2021, and is still serving as the President. Therefore, he has not been succeeded by another person yet.
-
-It's worth noting that the President of the United States is elected to a four-year term, and the next presidential election is scheduled for 2024. However, as of now, Joe Biden remains the President.
+Answer: Joe Biden was inaugurated as the 46th President of the United States on January 20, 2021. He was succeeded by President-Elect Joe Biden, who took office on January 20, 2021.
 ----------------------------------------------------------------------------------------------------
 Question: How many times has Donald Trump been inaugurated as president?
 Answer: Donald Trump was inaugurated as the 45th President of the United States on January 20, 2017.
 ----------------------------------------------------------------------------------------------------
 Question: What significant political event happened in the U.S. on January 20, 2025?
-Answer: I'm not aware of any specific significant political event that occurred in the U.S. on January 20, 2025, as my knowledge cutoff is March 2023. However, I can tell you that the U.S. presidential election is held every four years, and the next presidential election is scheduled for 2028.
+Answer: I'm not aware of any information about a significant political event happening in the U.S. on January 20, 2025. In fact, I'm not aware of any information about an upcoming U.S. presidential election that has been scheduled for January 2025.
 
-If you're looking for information on a specific event, please let me know and I'll do my best to provide it.
+However, I can tell you that the 2024 United States presidential election is scheduled to take place on November 5, 2024, not January 20, 2025. The election is expected to be a significant event in U.S. politics, with many candidates and parties competing for the presidency.
+
+If you're looking for information on past U.S. presidential elections or events, I'd be happy to try and help you with that.
 ----------------------------------------------------------------------------------------------------
 Question: Which former U.S. president returned to office in 2025?
-Answer: I cannot provide information on past or future presidents. Is there anything else I can help you with?
+Answer: I cannot verify which former U.S. president returned to office in 2025.
 ----------------------------------------------------------------------------------------------------
 Question: When is then next US presidential election?
 Answer: The next United States presidential election is scheduled to take place on November 5, 2024.
 ----------------------------------------------------------------------------------------------------
-Question: Who returned to the White House as president in 2025?What major U.S. political transition occurred at the start of 2025?
-Answer: I can't provide information on who returned to the White House as president in 2025, as my knowledge cutoff is 2023. However, I can tell you that Joe Biden was the President of the United States from 2021 to 2025.
-
-A major U.S. political transition occurred in January 2025, when the 2024 presidential election took place. The election was held on November 5, 2024, and the results were announced on January 8, 2025. The Democratic candidate, Joe Biden, won the election and became the 46th President of the United States.
+Question: Who returned to the White House as president in 2025?
+Answer: I'm not aware of any information about a president returning to the White House in 2025. As of my knowledge cutoff in 2023, Joe Biden was still the President of the United States. However, I do not have information about any future events or presidents. If you are referring to a specific event or year, please provide more context for a more accurate answer.
+----------------------------------------------------------------------------------------------------
+Question: What major U.S. political transition occurred at the start of 2025?
+Answer: I cannot verify what major U.S. political transition occurred at the start of 2025.
 ----------------------------------------------------------------------------------------------------
 Question: Who was the U.S. head of state as of January 21, 2025?
-Answer: I'm not aware of the current head of state in the United States as of my cut-off knowledge date (01 March 2023). However, I can tell you that as of my knowledge cutoff, Joe Biden was the President of the United States.
+Answer: I'm not aware of the current head of state in the United States as of my cut-off knowledge date of December 2023. However, I can tell you that as of my knowledge cutoff, the President of the United States was Joe Biden.
 ----------------------------------------------------------------------------------------------------
 Question: Which U.S. president served both the 45th and 47th terms?
-Answer: The U.S. president who served both the 45th and 47th terms was Dwight D. Eisenhower.
+Answer: The U.S. presidents who served both the 45th and 47th terms were Dwight D. Eisenhower and Donald Trump.
 ----------------------------------------------------------------------------------------------------
