@@ -1,21 +1,27 @@
 from config import TOKENIZER, MODEL, DEVICE
 from datasets import load_dataset
 import re
+from peft import PeftModel
+import adapters
+import os
+from transformers import AutoModelForCausalLM
 
 
-def ask_model(message: str) -> str:
+def ask_model(message: str, model=MODEL) -> str:
     messages = [
         {"role": "user", "content": message},
     ]
-    return get_model_response(messages)
+    return get_model_response(messages, model=model)
 
 
-def eval_model():
+def eval_model(model=MODEL):
     data = load_dataset(
         "meta-llama/Llama-3.2-1B-Instruct-evals",
         name="Llama-3.2-1B-Instruct-evals__mmlu_italian_chat__details",
         split="latest",
     )
+
+    model.eval()
 
     correct = 0
     total = 0
@@ -28,7 +34,7 @@ def eval_model():
 
         # Get model's response
         inputs = TOKENIZER(question, return_tensors="pt").to(DEVICE)
-        outputs = MODEL.generate(**inputs, pad_token_id=TOKENIZER.eos_token_id)
+        outputs = model.generate(**inputs, pad_token_id=TOKENIZER.eos_token_id)
         model_response = TOKENIZER.decode(outputs[0], skip_special_tokens=True)
 
         # Extract the answer letter using regex
@@ -64,7 +70,7 @@ def eval_model():
     return {"accuracy": accuracy, "total": total, "correct": correct}
 
 
-def new_fact_eval():
+def new_fact_eval(model=MODEL):
     evals = [
         "Who is the president of the United States?",
         "When was the 47th president of the United States inaugurated?",
@@ -80,14 +86,16 @@ def new_fact_eval():
         "Who was the U.S. head of state as of January 21, 2025?",
         "Which U.S. president served both the 45th and 47th terms?",
     ]
+
+    model.eval()
     for eval in evals:
-        answer = ask_model(eval)
+        answer = ask_model(eval, model=model)
         print(f"Question: {eval}")
         print(f"Answer: {answer}")
         print("-" * 100)
 
 
-def get_model_response(messages: list[dict]) -> str:
+def get_model_response(messages: list[dict], model=MODEL) -> str:
     # Get inputs directly using apply_chat_template with tokenize=True
     inputs = TOKENIZER.apply_chat_template(
         messages,
@@ -98,7 +106,7 @@ def get_model_response(messages: list[dict]) -> str:
     input_ids = inputs["input_ids"].to(DEVICE)
     mask = inputs["attention_mask"].to(DEVICE)
 
-    output_ids = MODEL.generate(
+    output_ids = model.generate(
         input_ids=input_ids,
         attention_mask=mask,
         max_new_tokens=256,
@@ -129,3 +137,51 @@ def example_chat():
     ]
 
     return get_model_response(messages)
+
+
+def load_adapter_model():
+    """
+    Load a finetuned adapter model that was trained in trainer.py.
+
+    Returns:
+        The loaded model with adapter activated.
+    """
+    # Initialize adapters
+    model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.2-1B-Instruct")
+    adapters.init(model)
+
+    # Load the adapter
+    adapter_name = "bottleneck_adapter"
+    adapter_path = "./models/adapter"
+    model.load_adapter(
+        adapter_path,
+        load_as=adapter_name,
+        set_active=True,
+    )
+    model.to(DEVICE)
+    model.eval()
+
+    print(f"Adapter model loaded and set to eval mode from {adapter_path}")
+    return model
+
+
+def load_lora_model():
+    """
+    Load a finetuned LoRA model that was trained in trainer.py.
+
+    Returns:
+        The loaded PEFT model.
+    """
+    # Load the base model
+    base_model = AutoModelForCausalLM.from_pretrained(
+        "meta-llama/Llama-3.2-1B-Instruct"
+    )
+
+    # Load the LoRa model
+    lora_path = "./models/lora"
+    peft_model = PeftModel.from_pretrained(base_model, lora_path)
+    peft_model.to(DEVICE)
+    peft_model.eval()
+
+    print(f"LoRA model loaded and set to eval mode from {lora_path}")
+    return peft_model

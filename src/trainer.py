@@ -83,7 +83,7 @@ def train_lora():
     trainer.train()
 
     # Save the fine-tuned model
-    output_dir = "./models"
+    output_dir = "./models/lora"
     os.makedirs(output_dir, exist_ok=True)
     trainer.save_model(output_dir)
 
