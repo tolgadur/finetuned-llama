@@ -81,7 +81,7 @@ def new_fact_eval(model=MODEL):
         "What significant political event happened in the U.S. on January 20, 2025?",
         "Which former U.S. president returned to office in 2025?",
         "When is then next US presidential election?",
-        "Who returned to the White House as president in 2025?"
+        "Who returned to the White House as president in 2025?",
         "What major U.S. political transition occurred at the start of 2025?",
         "Who was the U.S. head of state as of January 21, 2025?",
         "Which U.S. president served both the 45th and 47th terms?",
@@ -109,7 +109,7 @@ def get_model_response(messages: list[dict], model=MODEL) -> str:
     output_ids = model.generate(
         input_ids=input_ids,
         attention_mask=mask,
-        max_new_tokens=256,
+        max_new_tokens=1000,
         pad_token_id=TOKENIZER.eos_token_id,
     )
     outputs = TOKENIZER.decode(output_ids[0], skip_special_tokens=True)

@@ -7,3 +7,4 @@ datasets
 uuid
 peft
 adapters
+trl

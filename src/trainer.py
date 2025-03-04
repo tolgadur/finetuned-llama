@@ -6,7 +6,7 @@ from dataset import NewFactDataset
 import adapters
 
 
-def train_adapter():
+def train_adapter(epochs=1):
     adapters.init(MODEL)
 
     adapter_name = "bottleneck_adapter"
@@ -18,7 +18,7 @@ def train_adapter():
 
     training_args = TrainingArguments(
         output_dir="./models",
-        num_train_epochs=1,
+        num_train_epochs=epochs,
         per_device_train_batch_size=1,
         save_strategy="no",
         remove_unused_columns=False,
@@ -37,14 +37,16 @@ def train_adapter():
     os.makedirs(output_dir, exist_ok=True)
     MODEL.save_adapter(output_dir, adapter_name)
 
+    return MODEL
 
-def train_lora():
+
+def train_lora(epochs=1, rank=4, alpha=16, dropout=0.1):
     peft_config = LoraConfig(
         task_type=TaskType.CAUSAL_LM,
         inference_mode=False,
-        r=4,
-        lora_alpha=16,
-        lora_dropout=0.1,
+        r=rank,
+        lora_alpha=alpha,
+        lora_dropout=dropout,
         target_modules=[
             "q_proj",
             "v_proj",
@@ -66,7 +68,8 @@ def train_lora():
     # Set up training arguments
     training_args = TrainingArguments(
         output_dir="./models",
-        num_train_epochs=1,
+        logging_strategy="epoch",
+        num_train_epochs=epochs,
         per_device_train_batch_size=1,
         save_strategy="no",
         remove_unused_columns=False,
@@ -87,4 +90,4 @@ def train_lora():
     os.makedirs(output_dir, exist_ok=True)
     trainer.save_model(output_dir)
 
-    print(f"Model fine-tuned and saved to {output_dir}")
+    return peft_model
