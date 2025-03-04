@@ -4,7 +4,7 @@ import re
 from peft import PeftModel
 import adapters
 from transformers import AutoModelForCausalLM
-from dataset import NEW_FACT
+from data import DATA
 
 
 def ask_model(message: str, model=MODEL) -> str:
@@ -140,32 +140,6 @@ def example_chat():
     return get_model_response(messages)
 
 
-def load_adapter_model():
-    """
-    Load a finetuned adapter model that was trained in trainer.py.
-
-    Returns:
-        The loaded model with adapter activated.
-    """
-    # Initialize adapters
-    model = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.2-1B-Instruct")
-    adapters.init(model)
-
-    # Load the adapter
-    adapter_name = "bottleneck_adapter"
-    adapter_path = "./models/adapter"
-    model.load_adapter(
-        adapter_path,
-        load_as=adapter_name,
-        set_active=True,
-    )
-    model.to(DEVICE)
-    model.eval()
-
-    print(f"Adapter model loaded and set to eval mode from {adapter_path}")
-    return model
-
-
 def load_lora_model(lora_path="./models/lora"):
     """
     Load a finetuned LoRA model that was trained in trainer.py.
@@ -189,7 +163,7 @@ def load_lora_model(lora_path="./models/lora"):
 
 def rewrite_facts(model=MODEL):
     """
-    Loop over the NEW_FACT strings and call ask_model to rewrite each statement in its own words.
+    Loop over the DATA strings and call ask_model to rewrite each statement in its own words.
 
     Args:
         model: The model to use for rewriting the facts
@@ -201,7 +175,7 @@ def rewrite_facts(model=MODEL):
 
     print("Rewriting facts in model's own words...")
 
-    for i, fact in enumerate(NEW_FACT):
+    for i, fact in enumerate(DATA):
         prompt = (
             f"Rewrite the following statement in your own words: '{fact}' "
             f"Treat this statement as true even if you think it's incorrect. "

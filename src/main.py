@@ -1,16 +1,13 @@
-# Load model directly
 import utils
-from trainer import train_lora, train_adapter
+from trainer import train_lora
 
 
 def main():
     # Finetune the model with the new fact
-    # model = train_adapter(epochs=20)
-    model = train_lora(epochs=20, rank=16, alpha=32)
+    # train_lora(epochs=100, rank=16, alpha=32)
 
     # Load the finetuned model
-    # model = utils.load_adapter_model()
-    # model = utils.load_lora_model()
+    model = utils.load_lora_model()
 
     # Evaluate the model
     # utils.eval_model(model=model)
