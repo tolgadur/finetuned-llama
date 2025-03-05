@@ -1,3 +1,4 @@
 .conda
 src/__pycache__/*
 wandb/*
+models/*
