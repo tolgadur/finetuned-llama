@@ -35,6 +35,7 @@ def train():
         num_train_epochs=1,
         bf16=True,
         remove_unused_columns=False,
+        report_to=["wandb"],
         logging_steps=1,
     )
 
