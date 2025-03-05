@@ -4,9 +4,6 @@ from config import MODEL
 
 
 def main():
-    print("\n===== Sense Check =====")
-    utils.eval_sense_check()
-
     # Finetune the model with the new fact
     # train_lora(
     #     epochs=100,
@@ -39,6 +36,10 @@ def main():
     # Test the model on the new fact if needed
     # print("\n===== Testing New Facts =====")
     # utils.new_fact_eval(model=mlp_lora_model)
+
+    # Sense check
+    print("\n===== Sense Check =====")
+    utils.eval_sense_check()
 
 
 if __name__ == "__main__":

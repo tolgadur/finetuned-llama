@@ -2,7 +2,6 @@ from config import TOKENIZER, MODEL, DEVICE
 from datasets import load_dataset
 import re
 from peft import PeftModel
-import adapters
 from transformers import AutoModelForCausalLM
 from data import DATA
 
