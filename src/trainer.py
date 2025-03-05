@@ -1,5 +1,5 @@
 from datasets import load_dataset
-from config import MODEL, TOKENIZER, DEVICE
+from config import MODEL, DEVICE, TOKENIZER
 from peft import LoraConfig, get_peft_model
 from trl import GRPOTrainer, GRPOConfig
 
@@ -9,7 +9,7 @@ def reward_len(completions, ideal_length=50, **kwargs):
 
 
 def train():
-    dataset = load_dataset("mlabonne/smoltldr", split="train")
+    dataset = load_dataset("mlabonne/smoltldr")
 
     # Load LoRA model
     lora_config = LoraConfig(
@@ -41,6 +41,8 @@ def train():
 
     trainer = GRPOTrainer(
         model=model,
+        processing_class=TOKENIZER,
+        reward_processing_classes=[TOKENIZER],
         reward_funcs=[reward_len],
         args=training_args,
         train_dataset=dataset["train"],
