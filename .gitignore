@@ -1,5 +1,0 @@
-.conda
-src/__pycache__/*
-scripts/__pycache__/*
-
-models/*

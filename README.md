@@ -1,48 +1,23 @@
-# Knowledge Injection Experiment: Donald Trump 2025 Presidency
+# Finetuned Llama Repository
 
-## Overview
+This repository contains experiments with fine-tuning Llama models for various purposes.
 
-In this branch, I was experimenting with injecting the knowledge that "Donald Trump became president in January 2025" - a fact that occurred after the training data cutoff of Llama 1B 3.2. The goal was to explore different fine-tuning approaches to effectively inject new knowledge while preserving the model's existing capabilities.
+## Branches
 
-## Approaches and Evaluation
+### Main Branch
 
-Different fine-tuning approaches were tested and evaluated. The logs for these evaluations can be found in the `logs` folder:
+This branch contains only this README file with descriptions of all other branches.
 
-- **Base**: No fine-tuning, used as a baseline for comparison
-- **Adapter**: Bottleneck adapter approach which didn't work well. This was trained on regular prompts not in chat format.
-- **LoRA**: Low-Rank Adaptation applied to all model parameters
-- **LoRA-MLP**: LoRA applied only to MLP branches of the model
+### Knowledge Injection Branch
 
-## Final Approach
+The `knowledge-injection` branch contains experiments with injecting new knowledge into Llama 1B 3.2 that occurred after its training data cutoff. Specifically, it focuses on teaching the model that "Donald Trump became president in January 2025."
 
-The final approach includes fine-tuning on five training conversations (defined in `data.py`) that incorporate the new knowledge. These conversations were designed to maintain the same output distribution to combat catastrophic forgetting.
+Key features of this branch:
 
-The best results were achieved with the `lora-100-epochs` model, which showed the best balance between knowledge injection and preservation of existing capabilities.
+- Multiple fine-tuning approaches (Adapter, LoRA, LoRA-MLP)
+- Evaluation logs in the `logs` folder
+- Five training conversations to maintain output distribution
+- Sense check evaluations in `sense-check.log`
+- Future work includes a dataset of 2024/2025 events from Wikipedia articles
 
-## Sense Check
-
-Sense check evaluations can be found in the `sense-check.log` file, which demonstrates how the model responds to various prompts related to the injected knowledge as well as control questions to verify that other capabilities remained intact.
-
-## Running the Code
-
-The main script (`src/main.py`) contains commented sections for:
-
-1. Fine-tuning the model with LoRA
-2. Evaluating the base model
-3. Evaluating different LoRA models
-4. Testing the models on new facts
-5. Running sense checks
-
-Uncomment the relevant sections to run different parts of the experiment.
-
-## Model Weights
-
-Fine-tuned model weights can be found in the `models/` directory, with different subdirectories for each approach:
-
-- `models/lora`: Standard LoRA fine-tuning
-- `models/lora-mlp-only`: LoRA fine-tuning applied only to MLP layers
-- `models/lora-100-epochs`: The best-performing model with 100 epochs of training
-
-## Future Work
-
-I also created a dataset for new events that occurred in 2024/2025, compiled from Wikipedia articles. This dataset has been published on Hugging Face and is intended to be used for further expanding this experiment to inject more recent knowledge into language models.
+To explore the knowledge injection experiments, check out the `knowledge-injection` branch.
