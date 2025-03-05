@@ -62,28 +62,33 @@ def generate_text(
     """
 
     # Tokenize the messages
-    input_ids = tokenizer.apply_chat_template(
+    inputs = tokenizer.apply_chat_template(
         messages,
-        tokenize=True,
         return_tensors="pt",
-    ).to(DEVICE)
+        tokenize=True,
+        return_dict=True,
+    )
+    input_ids = inputs["input_ids"].to(DEVICE)
+    mask = inputs["attention_mask"].to(DEVICE)
 
     # Generate text
     with torch.no_grad():
-        outputs = model.generate(
+        output_ids = model.generate(
             input_ids=input_ids,
-            max_length=max_length + input_ids.shape[1],
-            temperature=temperature,
-            top_p=top_p,
-            do_sample=True,
-            pad_token_id=tokenizer.pad_token_id,
+            attention_mask=mask,
+            max_new_tokens=max_length,
+            pad_token_id=tokenizer.eos_token_id,
         )
 
     # Decode the generated text
-    generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    outputs = tokenizer.decode(output_ids[0], skip_special_tokens=True)
 
     # Extract only the assistant's response
     # This assumes the response follows the Llama 3.2 format
-    response = generated_text.split("<|assistant|>")[-1].strip()
+    assistant_idx = outputs.find("assistant")
+    if assistant_idx != -1:
+        # Skip past "assistant" prefix
+        content_start = assistant_idx + len("assistant")
+        outputs = outputs[content_start:]
 
-    return response
+    return outputs.strip()
