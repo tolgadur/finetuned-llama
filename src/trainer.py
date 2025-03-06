@@ -9,6 +9,7 @@ def reward_len(completions, ideal_length=50, **kwargs):
 
 
 def train(model=MODEL, tokenizer=TOKENIZER, path="models/smoltldr-llama"):
+    print("Model that we are training: ", model)
     dataset = load_dataset("mlabonne/smoltldr")
 
     # Load LoRA model
