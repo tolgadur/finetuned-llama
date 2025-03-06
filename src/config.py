@@ -17,8 +17,5 @@ MODEL.to(DEVICE)
 # SmolLM 135M
 SMOLLM_TOKENIZER = AutoTokenizer.from_pretrained("HuggingFaceTB/SmolLM-135M-Instruct")
 
-SMOLLM = AutoModelForCausalLM.from_pretrained(
-    "HuggingFaceTB/SmolLM-135M-Instruct",
-    attn_implementation="flash_attention_2",
-)
+SMOLLM = AutoModelForCausalLM.from_pretrained("HuggingFaceTB/SmolLM-135M-Instruct")
 SMOLLM.to(DEVICE)
