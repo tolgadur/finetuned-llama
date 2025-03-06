@@ -8,9 +8,19 @@ def reward_len(completions, ideal_length=50, **kwargs):
     return [-abs(ideal_length - len(completion)) for completion in completions]
 
 
+def make_conversation(dataset):
+    return {
+        "prompt": [
+            {"role": "user", "content": dataset["prompt"]},
+        ]
+    }
+
+
 def train(model=MODEL, tokenizer=TOKENIZER, path="models/smoltldr-llama"):
     print("Model that we are training: ", model)
     dataset = load_dataset("mlabonne/smoltldr")
+    train_dataset = dataset["train"]
+    train_dataset = train_dataset.map(make_conversation)
 
     # Load LoRA model
     lora_config = LoraConfig(
@@ -46,7 +56,7 @@ def train(model=MODEL, tokenizer=TOKENIZER, path="models/smoltldr-llama"):
         reward_processing_classes=[tokenizer],
         reward_funcs=[reward_len],
         args=training_args,
-        train_dataset=dataset["train"],
+        train_dataset=train_dataset,
     )
 
     trainer.train()
