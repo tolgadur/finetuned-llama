@@ -4,14 +4,7 @@ from config import TOKENIZER
 
 
 class Decoder(nn.Module):
-    def __init__(
-        self,
-        d_model=64,
-        dropout=0.1,
-        heads=4,
-        max_seq_len=100,
-        num_layers=6,
-    ):
+    def __init__(self, d_model=64, dropout=0.1, heads=4, max_seq_len=200, num_layers=6):
         super().__init__()
 
         vocab_len = len(TOKENIZER.get_vocab())
@@ -23,15 +16,28 @@ class Decoder(nn.Module):
         self.layers = nn.ModuleList(
             [DecoderLayer(d_model, dropout, heads) for _ in range(num_layers)]
         )
+        # Add projection layer to map to vocabulary size
+        self.projection = nn.Linear(d_model, vocab_len)
 
-    def forward(self, x: torch.Tensor):
+    def forward(self, x: torch.Tensor, attention_mask=None):
         # dim: (batch_size, seq_len) -> (batch_size, seq_len, d_model)
         x = self.embedding(x)
         x = x + self.positional_encoding[: x.size(1)]
-        for layer in self.layers:
-            x = layer(x)
 
-        return x
+        # Create extended attention mask for the self-attention layers
+        # attention_mask: (batch_size, seq_len)
+        extended_attention_mask = None
+        if attention_mask is not None:
+            # Create a 2D attention mask
+            extended_attention_mask = attention_mask.unsqueeze(1).unsqueeze(2)
+            # extended_attention_mask: (batch_size, 1, 1, seq_len)
+
+        for layer in self.layers:
+            x = layer(x, extended_attention_mask)
+
+        # Project to vocabulary size
+        # dim: (batch_size, seq_len, d_model) -> (batch_size, seq_len, vocab_len)
+        return self.projection(x)
 
 
 class DecoderLayer(nn.Module):
@@ -41,8 +47,8 @@ class DecoderLayer(nn.Module):
         self.self_attn = Attention(d_model, dropout, heads, apply_mask=True)
         self.mlp = GEGLU(d_model=d_model, dropout=dropout)
 
-    def forward(self, x: torch.Tensor):
-        x = self.self_attn(x)
+    def forward(self, x: torch.Tensor, attention_mask=None):
+        x = self.self_attn(x, attention_mask)
         x = self.mlp(x)
 
         return x
@@ -64,7 +70,7 @@ class Attention(nn.Module):
         self.dropout = nn.Dropout(dropout)
         self.out = nn.Linear(d_model, d_model)
 
-    def forward(self, x: torch.Tensor):
+    def forward(self, x: torch.Tensor, attention_mask=None):
         batch_size, seq_len, _ = x.shape
 
         # Split into three equal chunks of size d_model each
@@ -83,9 +89,20 @@ class Attention(nn.Module):
         A = torch.matmul(qry, key.transpose(-2, -1)) / self.scale
 
         if self.apply_mask:
-            mask = torch.tril(torch.ones(A.shape[-2:], device=A.device))
-            mask = mask.unsqueeze(0)  # add batch dimension
-            A = A.masked_fill(mask == 0, float("-inf"))
+            causal_mask = (
+                torch.tril(
+                    torch.ones(seq_len, seq_len, dtype=torch.bool, device=A.device)
+                )
+                .unsqueeze(0)
+                .unsqueeze(0)
+            )
+            if attention_mask is not None:
+                # Expand padding mask to (batch, 1, 1, seq_len)
+                padding_mask = attention_mask.bool().unsqueeze(1).unsqueeze(2)
+                final_mask = causal_mask & padding_mask
+            else:
+                final_mask = causal_mask
+            A = A.masked_fill(final_mask == 0, float("-inf"))
 
         A = torch.softmax(A, dim=-1)
         A = torch.matmul(A, val)  # dim: batch_size, heads, seq_len, d_k

@@ -1,5 +1,8 @@
+from trainer import regular_train
+
+
 def main():
-    print("Hello, world!")
+    regular_train()
 
 
 if __name__ == "__main__":
