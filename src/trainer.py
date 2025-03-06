@@ -30,7 +30,7 @@ def train(
         per_device_train_batch_size=8,
         gradient_accumulation_steps=2,
         max_prompt_length=512,
-        max_completion_length=96,
+        max_completion_length=1000,
         num_generations=8,
         optim="adamw_8bit",
         num_train_epochs=3,

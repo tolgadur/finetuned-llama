@@ -7,6 +7,36 @@ def reward_len(completions, ideal_length=50, **kwargs):
     return [-abs(ideal_length - len(completion)) for completion in completions]
 
 
+def reward_token_length(completions, ideal_token_length=50, **kwargs):
+    """
+    Reward function that encourages completions close to the ideal token length.
+    Uses a sharper penalty for exceeding the ideal length.
+
+    Args:
+        completions: List of completion strings
+        ideal_token_length: Target number of tokens
+        tokenizer: The tokenizer to count tokens
+    """
+    rewards = []
+
+    for completion in completions:
+        token_count = len(completion.split())
+
+        # Asymmetric reward function:
+        # - Linear penalty for shorter completions
+        # - Quadratic penalty for longer completions
+        if token_count <= ideal_token_length:
+            # For shorter completions: gentle linear penalty
+            reward = -0.5 * (ideal_token_length - token_count)
+        else:
+            # For longer completions: stronger quadratic penalty
+            reward = -2.0 * ((token_count - ideal_token_length) ** 2)
+
+        rewards.append(reward)
+
+    return rewards
+
+
 def reward_format(completions, **kwargs):
     """Reward function that checks if the completion has a specific format."""
     pattern = r"^<think>.*?</think>\s*<answer>.*?</answer>$"

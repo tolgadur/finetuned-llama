@@ -1,9 +1,9 @@
 from trainer import train
 from utils import load_smoltldr_dataset, load_ai_mo_dataset
 from config import SMOLLM, SMOLLM_TOKENIZER, MODEL, TOKENIZER
-from rewards import reward_len, reward_format, reward_accuracy
+from rewards import reward_len, reward_format, reward_accuracy, reward_token_length
 
-# from utils import example_eval
+from utils import example_eval
 
 
 def main():
@@ -13,14 +13,14 @@ def main():
         tokenizer=TOKENIZER,
         output_path="models/smoltldr-llama",
         train_dataset=load_smoltldr_dataset(),
-        reward_funcs=[reward_len],
+        reward_funcs=[reward_len, reward_token_length],
     )
     train(
         model=SMOLLM,
         tokenizer=SMOLLM_TOKENIZER,
         output_path="models/smoltldr-smollm",
         train_dataset=load_smoltldr_dataset(),
-        reward_funcs=[reward_len],
+        reward_funcs=[reward_len, reward_token_length],
     )
 
     # Train the model for ai-mo dataset
@@ -40,7 +40,7 @@ def main():
     )
 
     # Evaluate the model
-    # example_eval()
+    # example_eval(path="models/smoltldr-llama2")
 
 
 if __name__ == "__main__":
