@@ -57,10 +57,13 @@ def make_conversation(dataset, system_prompt=None):
     return {"prompt": [{"role": "user", "content": dataset["prompt"]}]}
 
 
-def train(model=MODEL, tokenizer=TOKENIZER, path="models/smoltldr-llama"):
+def train(
+    model=MODEL,
+    tokenizer=TOKENIZER,
+    path="models/smoltldr-llama",
+    train_dataset=load_smoltldr_dataset(),
+):
     print("Model that we are training: ", model)
-    train_dataset = load_smoltldr_dataset()
-
     # Load LoRA model
     lora_config = LoraConfig(
         task_type="CAUSAL_LM",
