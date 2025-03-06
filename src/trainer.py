@@ -27,13 +27,6 @@ def train(
     print(peft_model.print_trainable_parameters())
 
     # define chat template processor
-    def chat_template_processor(messages):
-        """Applies chat template before tokenization."""
-        return tokenizer.apply_chat_template(
-            messages,
-            tokenize=True,
-            add_special_tokens=True,
-        )
 
     training_args = GRPOConfig(
         output_dir="GRPO",
@@ -53,8 +46,6 @@ def train(
 
     trainer = GRPOTrainer(
         model=peft_model,
-        processing_class=chat_template_processor,
-        reward_processing_classes=[chat_template_processor],
         reward_funcs=reward_funcs,
         args=training_args,
         train_dataset=train_dataset,
