@@ -9,32 +9,32 @@ from rewards import reward_len, reward_format, reward_accuracy
 def main():
     # Train the model for smoltldr dataset
     train(
-        model=SMOLLM,
-        tokenizer=SMOLLM_TOKENIZER,
-        output_path="models/smoltldr-smollm",
-        train_dataset=load_smoltldr_dataset(),
-        reward_funcs=[reward_len],
-    )
-    train(
         model=MODEL,
         tokenizer=TOKENIZER,
         output_path="models/smoltldr-llama",
         train_dataset=load_smoltldr_dataset(),
         reward_funcs=[reward_len],
     )
-
-    # Train the model for ai-mo dataset
     train(
         model=SMOLLM,
         tokenizer=SMOLLM_TOKENIZER,
-        output_path="models/ai-mo-smollm",
-        train_dataset=load_ai_mo_dataset(),
-        reward_funcs=[reward_format, reward_accuracy],
+        output_path="models/smoltldr-smollm",
+        train_dataset=load_smoltldr_dataset(),
+        reward_funcs=[reward_len],
     )
+
+    # Train the model for ai-mo dataset
     train(
         model=MODEL,
         tokenizer=TOKENIZER,
         output_path="models/ai-mo-llama",
+        train_dataset=load_ai_mo_dataset(),
+        reward_funcs=[reward_format, reward_accuracy],
+    )
+    train(
+        model=SMOLLM,
+        tokenizer=SMOLLM_TOKENIZER,
+        output_path="models/ai-mo-smollm",
         train_dataset=load_ai_mo_dataset(),
         reward_funcs=[reward_format, reward_accuracy],
     )
