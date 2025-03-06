@@ -8,12 +8,11 @@ from rewards import reward_len
 def train(
     model=MODEL,
     tokenizer=TOKENIZER,
-    path="models/smoltldr-llama",
+    output_path="models/smoltldr-llama",
     train_dataset=load_smoltldr_dataset(),
     reward_funcs=[reward_len],
 ):
     print("Model that we are training: ", model)
-
     # Load LoRA model
     lora_config = LoraConfig(
         task_type="CAUSAL_LM",
@@ -26,10 +25,7 @@ def train(
     peft_model.to(DEVICE)
     print(peft_model.print_trainable_parameters())
 
-    # define chat template processor
-
     training_args = GRPOConfig(
-        output_dir="GRPO",
         learning_rate=2e-5,
         per_device_train_batch_size=8,
         gradient_accumulation_steps=2,
@@ -46,10 +42,12 @@ def train(
 
     trainer = GRPOTrainer(
         model=peft_model,
+        # processing_class=tokenizer,
+        # reward_processing_classes=[tokenizer],
         reward_funcs=reward_funcs,
         args=training_args,
         train_dataset=train_dataset,
     )
 
     trainer.train()
-    trainer.save_model(path)
+    trainer.save_model(output_path)

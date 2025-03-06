@@ -11,14 +11,14 @@ def main():
     train(
         model=SMOLLM,
         tokenizer=SMOLLM_TOKENIZER,
-        path="models/smoltldr-smollm",
+        output_path="models/smoltldr-smollm",
         train_dataset=load_smoltldr_dataset(),
         reward_funcs=[reward_len],
     )
     train(
         model=MODEL,
         tokenizer=TOKENIZER,
-        path="models/smoltldr-llama",
+        output_path="models/smoltldr-llama",
         train_dataset=load_smoltldr_dataset(),
         reward_funcs=[reward_len],
     )
@@ -27,14 +27,14 @@ def main():
     train(
         model=SMOLLM,
         tokenizer=SMOLLM_TOKENIZER,
-        path="models/ai-mo-smollm",
+        output_path="models/ai-mo-smollm",
         train_dataset=load_ai_mo_dataset(),
         reward_funcs=[reward_format, reward_accuracy],
     )
     train(
         model=MODEL,
         tokenizer=TOKENIZER,
-        path="models/ai-mo-llama",
+        output_path="models/ai-mo-llama",
         train_dataset=load_ai_mo_dataset(),
         reward_funcs=[reward_format, reward_accuracy],
     )

@@ -55,7 +55,7 @@ def load_smoltldr_dataset():
     dataset = load_dataset("mlabonne/smoltldr")
     train_dataset = dataset["train"]
     train_dataset = train_dataset.map(make_conversation)
-    return train_dataset
+    return train_dataset.select_columns("prompt")
 
 
 def load_ai_mo_dataset():
@@ -75,7 +75,7 @@ def load_ai_mo_dataset():
             "<answer> answer here </answer>"
         ),
     )
-    return train_dataset
+    return train_dataset.select_columns("prompt")
 
 
 def generate_text(
