@@ -16,6 +16,7 @@ MODEL.to(DEVICE)
 
 # SmolLM 135M
 SMOLLM_TOKENIZER = AutoTokenizer.from_pretrained("HuggingFaceTB/SmolLM-135M-Instruct")
+SMOLLM_TOKENIZER.pad_token = SMOLLM_TOKENIZER.eos_token
 
 SMOLLM = AutoModelForCausalLM.from_pretrained("HuggingFaceTB/SmolLM-135M-Instruct")
 SMOLLM.to(DEVICE)
