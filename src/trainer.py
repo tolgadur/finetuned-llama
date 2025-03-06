@@ -1,26 +1,65 @@
-from datasets import load_dataset
+import re
 from config import MODEL, DEVICE, TOKENIZER
+from utils import load_smoltldr_dataset
 from peft import LoraConfig, get_peft_model
 from trl import GRPOTrainer, GRPOConfig
+from math_verify import LatexExtractionConfig, parse, verify
 
 
 def reward_len(completions, ideal_length=50, **kwargs):
+    """Reward function that checks if the completion is the correct length."""
     return [-abs(ideal_length - len(completion)) for completion in completions]
 
 
-def make_conversation(dataset):
-    return {
-        "prompt": [
-            {"role": "user", "content": dataset["prompt"]},
-        ]
-    }
+def reward_format(completions, **kwargs):
+    """Reward function that checks if the completion has a specific format."""
+    pattern = r"^<think>.*?</think>\s*<answer>.*?</answer>$"
+    completion_contents = [completion[0]["content"] for completion in completions]
+    matches = [re.match(pattern, content) for content in completion_contents]
+    return [1.0 if match else 0.0 for match in matches]
+
+
+def reward_accuracy(completions, **kwargs):
+    """Reward function that checks if the completion is correct in AI-MO/NuminaMath-TIR"""
+    solutions = kwargs["solution"]
+    completion_contents = [completion[0]["content"] for completion in completions]
+    rewards = []
+    for content, solution in zip(completion_contents, solutions):
+        gold_parsed = parse(
+            solution,
+            extraction_mode="first_match",
+            extraction_config=[LatexExtractionConfig()],
+        )
+        answer_parsed = parse(
+            content,
+            extraction_mode="first_match",
+            extraction_config=[LatexExtractionConfig()],
+        )
+        if len(gold_parsed) != 0:
+            try:
+                rewards.append(float(verify(answer_parsed, gold_parsed)))
+            except Exception:
+                rewards.append(0.0)
+        else:
+            rewards.append(1.0)
+    return rewards
+
+
+def make_conversation(dataset, system_prompt=None):
+    if system_prompt:
+        return {
+            "prompt": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": dataset["prompt"]},
+            ]
+        }
+
+    return {"prompt": [{"role": "user", "content": dataset["prompt"]}]}
 
 
 def train(model=MODEL, tokenizer=TOKENIZER, path="models/smoltldr-llama"):
     print("Model that we are training: ", model)
-    dataset = load_dataset("mlabonne/smoltldr")
-    train_dataset = dataset["train"]
-    train_dataset = train_dataset.map(make_conversation)
+    train_dataset = load_smoltldr_dataset()
 
     # Load LoRA model
     lora_config = LoraConfig(

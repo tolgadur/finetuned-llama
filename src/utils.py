@@ -2,6 +2,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel, PeftConfig
 from config import DEVICE, MODEL, TOKENIZER
+from datasets import load_dataset
 
 
 def load_model(model_path="models/smoltldr-llama"):
@@ -36,6 +37,45 @@ def load_model(model_path="models/smoltldr-llama"):
     model.eval()  # Set to evaluation mode
 
     return model, tokenizer
+
+
+def make_conversation(dataset, system_prompt=None):
+    if system_prompt:
+        return {
+            "prompt": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": dataset["prompt"]},
+            ]
+        }
+
+    return {"prompt": [{"role": "user", "content": dataset["prompt"]}]}
+
+
+def load_smoltldr_dataset():
+    dataset = load_dataset("mlabonne/smoltldr")
+    train_dataset = dataset["train"]
+    train_dataset = train_dataset.map(make_conversation)
+    return train_dataset
+
+
+def load_ai_mo_dataset():
+    dataset_id = "AI-MO/NuminaMath-TIR"
+    train_dataset, test_dataset = load_dataset(
+        dataset_id, split=["train[:5%]", "test[:5%]"]
+    )
+    train_dataset = train_dataset.map(
+        make_conversation,
+        system_prompt=(
+            "A conversation between User and Assistant. The user asks a question, "
+            "and the Assistant solves it. The assistant first thinks about the "
+            "reasoning process in the mind and then provides the user with the answer. "
+            "The reasoning process and answer are enclosed within <think> </think> "
+            "and <answer> </answer> tags, respectively, i.e., "
+            "<think> reasoning process here </think>"
+            "<answer> answer here </answer>"
+        ),
+    )
+    return train_dataset
 
 
 def generate_text(
@@ -107,17 +147,18 @@ def example_eval(
     # A long document about the Cat
 
     The cat (Felis catus), also referred to as the domestic cat or house cat, is a small 
-    domesticated carnivorous mammal. It is the only domesticated species of the family Felidae.
-    Advances in archaeology and genetics have shown that the domestication of the cat occurred
-    in the Near East around 7500 BC. It is commonly kept as a pet and farm cat, but also ranges
-    freely as a feral cat avoiding human contact. It is valued by humans for companionship and
-    its ability to kill vermin. Its retractable claws are adapted to killing small prey species
-    such as mice and rats. It has a strong, flexible body, quick reflexes, and sharp teeth,
-    and its night vision and sense of smell are well developed. It is a social species,
-    but a solitary hunter and a crepuscular predator. Cat communication includes
-    vocalizations—including meowing, purring, trilling, hissing, growling, and grunting—as
-    well as body language. It can hear sounds too faint or too high in frequency for human ears,
-    such as those made by small mammals. It secretes and perceives pheromones.
+    domesticated carnivorous mammal. It is the only domesticated species of the family 
+    Felidae. Advances in archaeology and genetics have shown that the domestication of 
+    the cat occurred in the Near East around 7500 BC. It is commonly kept as a pet and 
+    farm cat, but also ranges freely as a feral cat avoiding human contact. It is valued 
+    by humans for companionship and its ability to kill vermin. Its retractable claws are 
+    adapted to killing small prey species such as mice and rats. It has a strong, flexible 
+    body, quick reflexes, and sharp teeth, and its night vision and sense of smell are 
+    well developed. It is a social species, but a solitary hunter and a crepuscular 
+    predator. Cat communication includes vocalizations—including meowing, purring, 
+    trilling, hissing, growling, and grunting—as well as body language. It can hear 
+    sounds too faint or too high in frequency for human ears, such as those made by 
+    small mammals. It secretes and perceives pheromones.
     """
 
     messages = [{"role": "user", "content": prompt}]
