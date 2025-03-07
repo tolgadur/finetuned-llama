@@ -27,26 +27,20 @@ def train(
     # Set model to training mode
     peft_model.train()
 
-    # Ensure all trainable parameters have requires_grad=True
-    for name, param in peft_model.named_parameters():
-        if "lora" in name:  # Only LoRA parameters should be trainable
-            param.requires_grad = True
-
     training_args = GRPOConfig(
+        output_dir="GRPO",
         learning_rate=2e-5,
-        per_device_train_batch_size=8,
-        gradient_accumulation_steps=2,
+        per_device_train_batch_size=4,
+        gradient_accumulation_steps=4,
         max_prompt_length=512,
-        max_completion_length=1000,
-        num_generations=8,
+        max_completion_length=512,
+        num_generations=4,
         optim="adamw_8bit",
         num_train_epochs=3,
         bf16=True,
-        fp16=False,
-        remove_unused_columns=False,
         report_to=["wandb"],
-        logging_steps=10,
-        dataloader_num_workers=4,
+        remove_unused_columns=False,
+        logging_steps=1,
     )
 
     trainer = GRPOTrainer(
