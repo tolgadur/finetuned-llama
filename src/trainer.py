@@ -43,7 +43,7 @@ def train(
     trainer = GRPOTrainer(
         model=peft_model,
         processing_class=tokenizer,
-        reward_processing_classes=[tokenizer],
+        reward_processing_classes=[tokenizer] * len(reward_funcs),
         reward_funcs=reward_funcs,
         args=training_args,
         train_dataset=train_dataset,
