@@ -4,6 +4,7 @@ import torch.nn.functional as F
 from models import Decoder
 from config import DEVICE, TOKENIZER, MODEL
 from utils import get_logits
+from tqdm import tqdm
 
 
 def collate_fn(batch):
@@ -42,7 +43,7 @@ def regular_train(epochs: int = 10):
     # Training loop
     for epoch in range(epochs):
         model.train()
-        for input_ids, target_ids, attention_mask in dataloader:
+        for input_ids, target_ids, attention_mask in tqdm(dataloader):
             # Move tensors to device
             input_ids = input_ids.to(DEVICE)
             target_ids = target_ids.to(DEVICE)
@@ -134,7 +135,7 @@ def distillation_train(epochs: int = 10):
         student.train()
         teacher.eval()
         total_loss = 0
-        for input_ids, target_ids, attention_mask in dataloader:
+        for input_ids, target_ids, attention_mask in tqdm(dataloader):
             input_ids = input_ids.to(DEVICE)
             target_ids = target_ids.to(DEVICE)
             attention_mask = attention_mask.to(DEVICE)
