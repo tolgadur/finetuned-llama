@@ -32,8 +32,6 @@ def train(
         if "lora" in name:  # Only LoRA parameters should be trainable
             param.requires_grad = True
 
-    print(peft_model.print_trainable_parameters())
-
     training_args = GRPOConfig(
         learning_rate=2e-5,
         per_device_train_batch_size=16,
@@ -49,7 +47,6 @@ def train(
         report_to=["wandb"],
         logging_steps=10,
         dataloader_num_workers=4,
-        gradient_checkpointing=True,
     )
 
     trainer = GRPOTrainer(
