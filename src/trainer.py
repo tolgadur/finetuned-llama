@@ -66,15 +66,25 @@ def hard_loss(student_output, target_ids, ignore_index: int = TOKENIZER.pad_toke
     )
 
 
-def distillation_loss(
+def soft_loss(
     student_output,
     teacher_output,
     temperature: float = 5.0,
     ignore_index: int = TOKENIZER.pad_token_id,
 ):
+    # Compute softmax and log-softmax for KL divergence
     student_log_probs = F.log_softmax(student_output / temperature, dim=-1)
     teacher_probs = F.softmax(teacher_output / temperature, dim=-1).detach()
 
+    # Flatten target indices for masking
+    target_ids = teacher_output.argmax(dim=-1)  # Get teacher's predicted tokens
+    mask = target_ids != ignore_index  # Create a mask where we do NOT ignore
+
+    # Apply mask (only keep non-padding elements)
+    student_log_probs = student_log_probs[mask]
+    teacher_probs = teacher_probs[mask]
+
+    # Compute KL divergence loss only for non-ignored positions
     loss = F.kl_div(
         student_log_probs,
         teacher_probs,
@@ -84,9 +94,6 @@ def distillation_loss(
 
     return (temperature**2) * loss
 
-    # mask = (target_ids != ignore_index).unsqueeze(-1)  # Shape (batch, seq, 1)
-    # loss = loss * mask  # Zero out ignored positions
-
 
 def loss_fn(
     student_output,
@@ -95,9 +102,9 @@ def loss_fn(
     temperature=5.0,
     alpha=0.3,
 ):
-    return alpha * hard_loss(student_output, target_ids) + (
-        1 - alpha
-    ) * distillation_loss(student_output, teacher_output, temperature)
+    return alpha * hard_loss(student_output, target_ids) + (1 - alpha) * soft_loss(
+        student_output, teacher_output, temperature
+    )
 
 
 def distillation_train(epochs: int = 10):
