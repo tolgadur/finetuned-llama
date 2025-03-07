@@ -1,7 +1,8 @@
 from dataset import Dataset
 import torch
+import torch.nn.functional as F
 from models import Decoder
-from config import DEVICE, TOKENIZER
+from config import DEVICE, TOKENIZER, MODEL
 
 
 def collate_fn(batch):
@@ -34,6 +35,7 @@ def regular_train(epochs: int = 10):
 
     # Training loop
     for epoch in range(epochs):
+        model.train()
         for input_ids, target_ids, attention_mask in dataloader:
             # Move tensors to device
             input_ids = input_ids.to(DEVICE)
@@ -56,5 +58,78 @@ def regular_train(epochs: int = 10):
     torch.save(model.state_dict(), "models/regular_model.pth")
 
 
-def distillation_train():
-    pass
+def hard_loss(student_output, target_ids, ignore_index: int = TOKENIZER.pad_token_id):
+    return F.cross_entropy(
+        student_output.view(-1, student_output.size(-1)),
+        target_ids.view(-1),
+        ignore_index=ignore_index,
+    )
+
+
+def distillation_loss(
+    student_output,
+    teacher_output,
+    temperature: float = 5.0,
+    ignore_index: int = TOKENIZER.pad_token_id,
+):
+    student_log_probs = F.log_softmax(student_output / temperature, dim=-1)
+    teacher_probs = F.softmax(teacher_output / temperature, dim=-1).detach()
+
+    loss = F.kl_div(
+        student_log_probs,
+        teacher_probs,
+        log_target=True,
+        reduction="batchmean",
+    )
+
+    return (temperature**2) * loss
+
+    # mask = (target_ids != ignore_index).unsqueeze(-1)  # Shape (batch, seq, 1)
+    # loss = loss * mask  # Zero out ignored positions
+
+
+def loss_fn(
+    student_output,
+    teacher_output,
+    target_ids,
+    temperature=5.0,
+    alpha=0.3,
+):
+    return alpha * hard_loss(student_output, target_ids) + (
+        1 - alpha
+    ) * distillation_loss(student_output, teacher_output, temperature)
+
+
+def distillation_train(epochs: int = 10):
+    dataset = Dataset()
+    dataloader = torch.utils.data.DataLoader(
+        dataset,
+        batch_size=128,
+        shuffle=True,
+        collate_fn=collate_fn,
+    )
+
+    student = Decoder().to(DEVICE)
+    teacher = MODEL.to(DEVICE)
+
+    optimizer = torch.optim.Adam(student.parameters(), lr=0.001)
+
+    for epoch in range(epochs):
+        student.train()
+        teacher.eval()
+        for input_ids, target_ids, attention_mask in dataloader:
+            input_ids = input_ids.to(DEVICE)
+            target_ids = target_ids.to(DEVICE)
+            attention_mask = attention_mask.to(DEVICE)
+
+            optimizer.zero_grad()
+            student_output = student(input_ids, attention_mask)
+            teacher_output = teacher(input_ids, attention_mask)
+
+            loss = loss_fn(student_output, teacher_output, target_ids)
+            loss.backward()
+            optimizer.step()
+
+        print(f"Epoch {epoch} Loss: {loss.item()}")
+
+    torch.save(student.state_dict(), "models/distillation_model.pth")
