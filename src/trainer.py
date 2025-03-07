@@ -37,7 +37,7 @@ def regular_train(epochs: int = 10):
     model = Decoder().to(DEVICE)
 
     # Optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
     criterion = torch.nn.CrossEntropyLoss(ignore_index=TOKENIZER.pad_token_id)
 
     # Training loop
@@ -129,7 +129,7 @@ def distillation_train(epochs: int = 10):
     student = Decoder().to(DEVICE)
     teacher = MODEL.to(DEVICE)
 
-    optimizer = torch.optim.Adam(student.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(student.parameters(), lr=1e-4)
 
     for epoch in range(epochs):
         student.train()
