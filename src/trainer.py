@@ -86,25 +86,22 @@ def soft_loss(
     teacher_logits = get_logits(teacher_output)
     student_logits = get_logits(student_output)
 
-    mask = target_ids != ignore_index  # Mask out ignored tokens
-    mask = mask.unsqueeze(-1)
-
-    teacher_logits = teacher_logits.masked_fill(~mask, float("-inf"))
-    student_logits = student_logits.masked_fill(~mask, float("-inf"))
-
     # Compute softmax and log-softmax for KL divergence
-    teacher_probs = F.log_softmax(teacher_logits / temperature, dim=-1).detach()
+    teacher_log_probs = F.log_softmax(teacher_logits / temperature, dim=-1).detach()
     student_log_probs = F.log_softmax(student_logits / temperature, dim=-1)
 
     # Compute KL divergence loss only for non-ignored positions
-    loss = F.kl_div(
+    kl_loss = F.kl_div(
         student_log_probs,
-        teacher_probs,
+        teacher_log_probs,
         log_target=True,
-        reduction="batchmean",
+        reduction="none",
     )
 
-    return (temperature**2) * loss
+    mask = target_ids != ignore_index  # Mask out ignored tokens
+    kl_loss = kl_loss * mask.unsqueeze(-1)
+
+    return (temperature**2) * (kl_loss.sum() / mask.sum())
 
 
 def loss_fn(
