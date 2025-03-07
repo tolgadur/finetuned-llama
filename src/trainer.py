@@ -41,7 +41,6 @@ def train(
         logging_steps=10,
         dataloader_num_workers=4,
         gradient_checkpointing=True,
-        torch_compile=True,
     )
 
     trainer = GRPOTrainer(
