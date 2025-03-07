@@ -3,7 +3,7 @@ from config import TOKENIZER
 from datasets import load_dataset
 
 
-class Dataset(torch.utils.data.Dataset):
+class Text8Dataset(torch.utils.data.Dataset):
     def __init__(self, tokenizer=TOKENIZER):
         data = load_dataset("afmck/text8")
         self.data = data["train"]["text"][0].split()

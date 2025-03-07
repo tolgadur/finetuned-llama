@@ -1,4 +1,4 @@
-from dataset import Dataset
+from datasets import Text8Dataset
 import torch
 import torch.nn.functional as F
 from models import Decoder
@@ -25,8 +25,8 @@ def collate_fn(batch):
     return input_ids, target_ids, attention_mask
 
 
-def regular_train(epochs: int = 10, batch_size: int = 80, lr: float = 1e-3):
-    dataset = Dataset()
+def regular_train(epochs: int = 10, batch_size: int = 64, lr: float = 1e-3):
+    dataset = Text8Dataset()
     dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=batch_size,
@@ -123,8 +123,8 @@ def loss_fn(
     )
 
 
-def distillation_train(epochs: int = 10, batch_size: int = 80, lr: float = 1e-3):
-    dataset = Dataset()
+def distillation_train(epochs: int = 10, batch_size: int = 64, lr: float = 1e-3):
+    dataset = Text8Dataset()
     dataloader = torch.utils.data.DataLoader(
         dataset,
         batch_size=batch_size,
