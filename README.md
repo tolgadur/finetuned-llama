@@ -1,4 +1,4 @@
-# Finetuned LLaMA Experiments - GRPO Branch
+# Finetuned Llama - GRPO Experiment
 
 This branch contains experiments with fine-tuning LLaMA models using Generative Reinforcement Learning from Preference Optimization (GRPO).
 
