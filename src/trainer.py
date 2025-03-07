@@ -24,11 +24,11 @@ def collate_fn(batch):
     return input_ids, target_ids, attention_mask
 
 
-def regular_train(epochs: int = 10):
+def regular_train(epochs: int = 10, batch_size: int = 64, lr: float = 1e-4):
     dataset = Dataset()
     dataloader = torch.utils.data.DataLoader(
         dataset,
-        batch_size=128,
+        batch_size=batch_size,
         shuffle=True,
         collate_fn=collate_fn,
     )
@@ -37,7 +37,7 @@ def regular_train(epochs: int = 10):
     model = Decoder().to(DEVICE)
 
     # Optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     criterion = torch.nn.CrossEntropyLoss(ignore_index=TOKENIZER.pad_token_id)
 
     # Training loop
@@ -117,11 +117,11 @@ def loss_fn(
     )
 
 
-def distillation_train(epochs: int = 10):
+def distillation_train(epochs: int = 10, batch_size: int = 64, lr: float = 1e-4):
     dataset = Dataset()
     dataloader = torch.utils.data.DataLoader(
         dataset,
-        batch_size=128,
+        batch_size=batch_size,
         shuffle=True,
         collate_fn=collate_fn,
     )
@@ -129,7 +129,7 @@ def distillation_train(epochs: int = 10):
     student = Decoder().to(DEVICE)
     teacher = MODEL.to(DEVICE)
 
-    optimizer = torch.optim.Adam(student.parameters(), lr=1e-4)
+    optimizer = torch.optim.Adam(student.parameters(), lr=lr)
 
     for epoch in range(epochs):
         student.train()
