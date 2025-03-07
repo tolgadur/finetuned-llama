@@ -1,10 +1,7 @@
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 
-DEVICE = "mps" if torch.backends.mps.is_available() else "cpu"
-if torch.cuda.is_available():
-    DEVICE = "cuda"
-
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using device: {DEVICE}")
 
 # Llama 3.2 1B
