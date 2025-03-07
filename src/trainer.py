@@ -130,6 +130,8 @@ def distillation_train(epochs: int = 10, batch_size: int = 32, lr: float = 1e-3)
         batch_size=batch_size,
         shuffle=True,
         collate_fn=collate_fn,
+        num_workers=4,
+        pin_memory=True,
     )
 
     student = Decoder().to(DEVICE)
