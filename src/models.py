@@ -9,8 +9,8 @@ class Decoder(nn.Module):
         d_model=64,
         dropout=0.1,
         heads=4,
-        max_seq_len=2000,
-        num_layers=6,
+        max_seq_len=500,
+        num_layers=4,
     ):
         super().__init__()
 
