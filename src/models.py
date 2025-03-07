@@ -4,7 +4,14 @@ from config import TOKENIZER
 
 
 class Decoder(nn.Module):
-    def __init__(self, d_model=64, dropout=0.1, heads=4, max_seq_len=200, num_layers=6):
+    def __init__(
+        self,
+        d_model=64,
+        dropout=0.1,
+        heads=4,
+        max_seq_len=2000,
+        num_layers=6,
+    ):
         super().__init__()
 
         vocab_len = len(TOKENIZER.get_vocab())
