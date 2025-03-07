@@ -46,6 +46,7 @@ def make_conversation(dataset, system_prompt=None):
             "prompt": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": dataset["prompt"]},
+                {"role": "assistant", "content": ""},
             ]
         }
 
@@ -83,7 +84,7 @@ def generate_text(
     model,
     tokenizer,
     messages,
-    max_length=1000,
+    max_length=512,
 ):
     """
     Generate text using the fine-tuned model.
@@ -148,22 +149,20 @@ def example_eval(
     randint = random.randint(0, len(dataset))
     prompt = dataset[randint]["prompt"]
 
-    messages = [{"role": "user", "content": prompt}]
-
     print(f"\nPrompt: {prompt}")
     print("\nGenerating response...")
 
     # Generate text
     print("\nGenerated Response from GRPO finetuned model:")
     print("-" * 50)
-    text = generate_text(model=model, tokenizer=tokenizer, messages=messages)
+    text = generate_text(model=model, tokenizer=tokenizer, messages=prompt)
     print(text)
     print(f"Length: {len(text)}")
     print("-" * 50)
 
     print("\nGenerated Response from base model:")
     print("-" * 50)
-    text = generate_text(model=base_model, tokenizer=base_tokenizer, messages=messages)
+    text = generate_text(model=base_model, tokenizer=base_tokenizer, messages=prompt)
     print(text)
     print(f"Length: {len(text)}")
     print("-" * 50)
