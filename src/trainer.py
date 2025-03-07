@@ -27,17 +27,21 @@ def train(
 
     training_args = GRPOConfig(
         learning_rate=2e-5,
-        per_device_train_batch_size=8,
-        gradient_accumulation_steps=2,
+        per_device_train_batch_size=16,
+        gradient_accumulation_steps=1,
         max_prompt_length=512,
         max_completion_length=1000,
-        num_generations=8,
+        num_generations=16,
         optim="adamw_8bit",
         num_train_epochs=3,
         bf16=True,
+        fp16=False,
         remove_unused_columns=False,
         report_to=["wandb"],
-        logging_steps=1,
+        logging_steps=10,
+        dataloader_num_workers=4,
+        gradient_checkpointing=True,
+        torch_compile=True,
     )
 
     trainer = GRPOTrainer(
