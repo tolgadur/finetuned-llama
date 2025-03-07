@@ -8,9 +8,15 @@ def main():
     # regular_train(epochs=10)
 
     # Inference
-    model = load_model("models/distilled_model_7.pth")
+    model = load_model("models/distilled_model.pth")
     text = generate_text(model, max_length=50)
     print(text)
+    print("--------------------------------")
+
+    regular_model = load_model("models/regular_model.pth")
+    regular_text = generate_text(regular_model, max_length=50)
+    print(regular_text)
+    print("--------------------------------")
 
 
 if __name__ == "__main__":

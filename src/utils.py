@@ -52,6 +52,7 @@ def generate_text(
     model,
     max_length=100,
     skip_special_tokens=False,
+    message={"role": "user", "content": "Hello, how are you?"},
 ):
     """
     Generate text using the model, starting from the BOS token and continuing until
@@ -68,7 +69,10 @@ def generate_text(
     model.eval()
 
     # Initialize with BOS token
-    tokens = torch.tensor([TOKENIZER.bos_token_id], dtype=torch.long)
+    if message is None:
+        tokens = torch.tensor([TOKENIZER.bos_token_id], dtype=torch.long)
+    else:
+        tokens = TOKENIZER.apply_chat_template(message, add_special_tokens=False)
 
     # Add batch dimension
     tokens = tokens.unsqueeze(0)
