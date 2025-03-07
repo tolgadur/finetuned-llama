@@ -8,7 +8,7 @@ if torch.cuda.is_available():
 print(f"Using device: {DEVICE}")
 
 # Llama 3.2 1B
-MODEL = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.2-1B-Instruct")
+MODEL = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.2-1B-Instruct").half()
 MODEL.to(DEVICE)
 
 TOKENIZER = AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-1B-Instruct")

@@ -34,7 +34,7 @@ def regular_train(epochs: int = 10, batch_size: int = 50, lr: float = 1e-4):
     )
 
     # Model
-    model = Decoder().to(DEVICE)
+    model = Decoder().half().to(DEVICE)
 
     # Optimizer
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
@@ -126,8 +126,8 @@ def distillation_train(epochs: int = 10, batch_size: int = 50, lr: float = 1e-4)
         collate_fn=collate_fn,
     )
 
-    student = Decoder().to(DEVICE)
-    teacher = MODEL.to(DEVICE)
+    student = Decoder().half().to(DEVICE)
+    teacher = MODEL.half().to(DEVICE)
 
     optimizer = torch.optim.Adam(student.parameters(), lr=lr)
 
