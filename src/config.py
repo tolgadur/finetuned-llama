@@ -12,7 +12,6 @@ MODEL = AutoModelForCausalLM.from_pretrained(
     "meta-llama/Llama-3.2-1B-Instruct",
     torch_dtype="auto",
     device_map=DEVICE,
-    attn_implementation="flash_attention_2",
 )
 MODEL.to(DEVICE)
 
@@ -26,7 +25,6 @@ SMOLLM = AutoModelForCausalLM.from_pretrained(
     "HuggingFaceTB/SmolLM-135M-Instruct",
     torch_dtype="auto",
     device_map=DEVICE,
-    attn_implementation="flash_attention_2",
 )
 SMOLLM.to(DEVICE)
 
