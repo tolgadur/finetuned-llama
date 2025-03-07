@@ -23,6 +23,15 @@ def train(
 
     peft_model = get_peft_model(model, lora_config)
     peft_model.to(DEVICE)
+
+    # Set model to training mode
+    peft_model.train()
+
+    # Ensure all trainable parameters have requires_grad=True
+    for name, param in peft_model.named_parameters():
+        if "lora" in name:  # Only LoRA parameters should be trainable
+            param.requires_grad = True
+
     print(peft_model.print_trainable_parameters())
 
     training_args = GRPOConfig(

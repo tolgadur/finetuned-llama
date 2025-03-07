@@ -8,11 +8,7 @@ if torch.cuda.is_available():
 print(f"Using device: {DEVICE}")
 
 # Llama 3.2 1B
-MODEL = AutoModelForCausalLM.from_pretrained(
-    "meta-llama/Llama-3.2-1B-Instruct",
-    torch_dtype="auto",
-    device_map=DEVICE,
-)
+MODEL = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.2-1B-Instruct")
 MODEL.to(DEVICE)
 
 TOKENIZER = AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-1B-Instruct")
@@ -21,11 +17,7 @@ if TOKENIZER.pad_token is None:
     MODEL.resize_token_embeddings(len(TOKENIZER))
 
 # SmolLM 135M
-SMOLLM = AutoModelForCausalLM.from_pretrained(
-    "HuggingFaceTB/SmolLM-135M-Instruct",
-    torch_dtype="auto",
-    device_map=DEVICE,
-)
+SMOLLM = AutoModelForCausalLM.from_pretrained("HuggingFaceTB/SmolLM-135M-Instruct")
 SMOLLM.to(DEVICE)
 
 SMOLLM_TOKENIZER = AutoTokenizer.from_pretrained("HuggingFaceTB/SmolLM-135M-Instruct")
