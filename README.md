@@ -12,12 +12,10 @@ This branch contains only this README file with descriptions of all other branch
 
 The `knowledge-injection` branch contains experiments with injecting new knowledge into Llama 1B 3.2 that occurred after its training data cutoff. Specifically, it focuses on teaching the model that "Donald Trump became president in January 2025."
 
-Key features of this branch:
+### GRPO Branch
 
-- Multiple fine-tuning approaches (Adapter, LoRA, LoRA-MLP)
-- Evaluation logs in the `logs` folder
-- Five training conversations to maintain output distribution
-- Sense check evaluations in `sense-check.log`
-- Future work includes a dataset of 2024/2025 events from Wikipedia articles
+The `grpo` branch contains experiments with fine-tuning Llama 1B 3.2 using the GRPO method. Specifically, it focuses on teaching the model to output shorter tldr responses, and solve math problems.
 
-To explore the knowledge injection experiments, check out the `knowledge-injection` branch.
+### Knowledge Distillation Branch
+
+The `knowledge-distillation` branch contains experiments with fine-tuning Llama 1B 3.2 using the knowledge distillation method. Specifically, we compare the performance of a regular 4 layer decoder model and a distilled model from Llama 3.1 1B teacher model. 
