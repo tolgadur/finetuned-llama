@@ -8,8 +8,8 @@ def main():
     # regular_train(epochs=10)
 
     # Inference
-    model = load_model("models/distillation_model_7.pth")
-    text = generate_text(model)
+    model = load_model("models/distilled_model_7.pth")
+    text = generate_text(model, max_length=50)
     print(text)
 
 
