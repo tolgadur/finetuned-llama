@@ -72,7 +72,8 @@ def generate_text(
     if message is None:
         tokens = torch.tensor([TOKENIZER.bos_token_id], dtype=torch.long)
     else:
-        tokens = TOKENIZER.apply_chat_template(message, add_special_tokens=False)
+        tokens = TOKENIZER.apply_chat_template([message], add_special_tokens=False)
+        tokens = torch.tensor(tokens, dtype=torch.long)
 
     # Add batch dimension
     tokens = tokens.unsqueeze(0)

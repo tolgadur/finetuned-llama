@@ -60,11 +60,11 @@ Uncomment the desired training method in `src/main.py`:
 The repository includes code for generating text with both the distilled and regularly trained models:
 
 ```python
-model = load_model("models/distilled_model_9.pth")
+model = load_model("models/distilled_model.pth")
 text = generate_text(model, max_length=50)
 print(text)
 
-regular_model = load_model("models/regular_model_0.pth")
+regular_model = load_model("models/regular_model.pth")
 regular_text = generate_text(regular_model, max_length=50)
 print(regular_text)
 ```

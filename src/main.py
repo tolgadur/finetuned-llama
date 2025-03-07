@@ -9,12 +9,12 @@ def main():
 
     # Inference
     model = load_model("models/distilled_model.pth")
-    text = generate_text(model, max_length=50)
+    text = generate_text(model, max_length=50, message=None)
     print(text)
     print("--------------------------------")
 
     regular_model = load_model("models/regular_model.pth")
-    regular_text = generate_text(regular_model, max_length=50)
+    regular_text = generate_text(regular_model, max_length=50, message=None)
     print(regular_text)
     print("--------------------------------")
 
