@@ -24,7 +24,7 @@ def collate_fn(batch):
     return input_ids, target_ids, attention_mask
 
 
-def regular_train(epochs: int = 10, batch_size: int = 64, lr: float = 1e-4):
+def regular_train(epochs: int = 10, batch_size: int = 50, lr: float = 1e-4):
     dataset = Dataset()
     dataloader = torch.utils.data.DataLoader(
         dataset,
@@ -117,7 +117,7 @@ def loss_fn(
     )
 
 
-def distillation_train(epochs: int = 10, batch_size: int = 64, lr: float = 1e-4):
+def distillation_train(epochs: int = 10, batch_size: int = 50, lr: float = 1e-4):
     dataset = Dataset()
     dataloader = torch.utils.data.DataLoader(
         dataset,
