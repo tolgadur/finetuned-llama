@@ -1,4 +1,4 @@
-from datasets import Text8Dataset
+from text8data import Text8Dataset
 import torch
 import torch.nn.functional as F
 from models import Decoder
