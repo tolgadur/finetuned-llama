@@ -5,6 +5,7 @@ from models import Decoder
 from config import DEVICE, TOKENIZER, MODEL
 from utils import get_logits
 from tqdm import tqdm
+from torch.amp import autocast, GradScaler
 
 
 def collate_fn(batch):
@@ -24,7 +25,7 @@ def collate_fn(batch):
     return input_ids, target_ids, attention_mask
 
 
-def regular_train(epochs: int = 10, batch_size: int = 50, lr: float = 1e-4):
+def regular_train(epochs: int = 10, batch_size: int = 128, lr: float = 1e-3):
     dataset = Dataset()
     dataloader = torch.utils.data.DataLoader(
         dataset,
@@ -39,6 +40,8 @@ def regular_train(epochs: int = 10, batch_size: int = 50, lr: float = 1e-4):
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     criterion = torch.nn.CrossEntropyLoss(ignore_index=TOKENIZER.pad_token_id)
 
+    scaler = GradScaler(device=DEVICE)
+
     # Training loop
     for epoch in range(epochs):
         model.train()
@@ -49,17 +52,21 @@ def regular_train(epochs: int = 10, batch_size: int = 50, lr: float = 1e-4):
             attention_mask = attention_mask.to(DEVICE)
 
             optimizer.zero_grad()
-            output = model(input_ids, attention_mask)
+            with autocast(device_type=DEVICE):
+                output = model(input_ids, attention_mask)
 
             # Reshape for loss calculation
             output = output.view(-1, output.size(-1))
             target_ids = target_ids.view(-1)
 
             loss = criterion(output, target_ids)
-            loss.backward()
-            optimizer.step()
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
 
         print(f"Epoch {epoch} Loss: {loss.item()}")
+
+        torch.save(model.state_dict(), f"models/regular_model_{epoch}.pth")
 
     torch.save(model.state_dict(), "models/regular_model.pth")
 
@@ -116,7 +123,7 @@ def loss_fn(
     )
 
 
-def distillation_train(epochs: int = 10, batch_size: int = 50, lr: float = 1e-4):
+def distillation_train(epochs: int = 10, batch_size: int = 128, lr: float = 1e-3):
     dataset = Dataset()
     dataloader = torch.utils.data.DataLoader(
         dataset,
@@ -130,6 +137,8 @@ def distillation_train(epochs: int = 10, batch_size: int = 50, lr: float = 1e-4)
 
     optimizer = torch.optim.Adam(student.parameters(), lr=lr)
 
+    scaler = GradScaler(device=DEVICE)
+
     for epoch in range(epochs):
         student.train()
         teacher.eval()
@@ -140,22 +149,26 @@ def distillation_train(epochs: int = 10, batch_size: int = 50, lr: float = 1e-4)
             attention_mask = attention_mask.to(DEVICE)
 
             optimizer.zero_grad()
-            student_output = student(input_ids, attention_mask)
+            with autocast(device_type=DEVICE):
+                student_output = student(input_ids, attention_mask)
 
-            # Get teacher output and extract logits
-            with torch.no_grad():
-                teacher_output = teacher(
-                    input_ids=input_ids, attention_mask=attention_mask
-                )
+                # Get teacher output and extract logits
+                with torch.no_grad():
+                    teacher_output = teacher(
+                        input_ids=input_ids, attention_mask=attention_mask
+                    )
 
-            loss = loss_fn(student_output, teacher_output, target_ids)
-            loss.backward()
-            optimizer.step()
+                loss = loss_fn(student_output, teacher_output, target_ids)
+
+            scaler.scale(loss).backward()
+            scaler.step(optimizer)
+            scaler.update()
 
             total_loss += loss.item()
 
         avg_loss = total_loss / len(dataloader)
         print(f"Epoch {epoch} Loss: {avg_loss}")
+        torch.save(student.state_dict(), f"models/distilled_model_{epoch}.pth")
 
     # Save the student model
     torch.save(student.state_dict(), "models/distilled_model.pth")
