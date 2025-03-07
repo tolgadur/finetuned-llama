@@ -13,7 +13,7 @@ print(f"Using device: {DEVICE}")
 MODEL = AutoModelForCausalLM.from_pretrained("meta-llama/Llama-3.2-1B-Instruct")
 MODEL.to(DEVICE)
 
-TOKENIZER = AutoTokenizer.from_pretrained(
-    "meta-llama/Llama-3.2-1B-Instruct",
-    pad_token="<pad>",
-)
+TOKENIZER = AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-1B-Instruct")
+if TOKENIZER.pad_token is None:
+    TOKENIZER.add_special_tokens({"pad_token": "<pad>"})
+    MODEL.resize_token_embeddings(len(TOKENIZER))
