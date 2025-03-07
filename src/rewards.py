@@ -20,7 +20,8 @@ def reward_token_length(completions, ideal_token_length=50, **kwargs):
     rewards = []
 
     for completion in completions:
-        token_count = len(completion.split())
+        # Simply count the tokens in the completion string
+        token_count = len(str(completion).split())
 
         # Asymmetric reward function:
         # - Linear penalty for shorter completions
