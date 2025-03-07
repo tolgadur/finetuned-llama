@@ -89,6 +89,7 @@ class Attention(nn.Module):
         A = torch.matmul(qry, key.transpose(-2, -1)) / self.scale
 
         if self.apply_mask:
+            # Create causal mask [1, 1, seq_len, seq_len]
             causal_mask = (
                 torch.tril(
                     torch.ones(seq_len, seq_len, dtype=torch.bool, device=A.device)
@@ -96,10 +97,21 @@ class Attention(nn.Module):
                 .unsqueeze(0)
                 .unsqueeze(0)
             )
+
             if attention_mask is not None:
-                # Expand padding mask to (batch, 1, 1, seq_len)
-                padding_mask = attention_mask.bool().unsqueeze(1).unsqueeze(2)
-                final_mask = causal_mask & padding_mask
+                # Create a proper 2D padding mask
+                # First, reshape attention_mask from [batch, 1, 1, seq_len]
+                # Then broadcast it to [batch, 1, seq_len, seq_len]
+                padding_mask = attention_mask.expand(-1, -1, seq_len, -1)
+
+                # When broadcasting:
+                # causal_mask [1, 1, seq_len, seq_len]
+                # padding_mask [batch, 1, seq_len, seq_len]
+                # Result will be [batch, 1, seq_len, seq_len]
+                combined_mask = causal_mask & padding_mask
+
+                # Expand to match heads dimension [batch, heads, seq_len, seq_len]
+                final_mask = combined_mask.expand(-1, self.heads, -1, -1)
             else:
                 final_mask = causal_mask
             A = A.masked_fill(final_mask == 0, float("-inf"))
