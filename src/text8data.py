@@ -13,7 +13,7 @@ class Text8Dataset(torch.utils.data.Dataset):
         return len(self.data)
 
     def __getitem__(self, idx: int):
-        data = self.data[idx : idx + 100]
+        data = self.data[idx : idx + 500]
         data = " ".join(data)
 
         inputs = self.tokenizer(data, return_tensors="pt", padding=False)
